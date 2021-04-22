@@ -11,7 +11,7 @@ use Mix.Config
 # before starting your production server.
 config :hangman, HangmanWeb.Endpoint,
   url: [host: System.get_env("HOSTNAME"), port: 4000],
-  :check_origin: false
+  check_origin: false
 
 # Do not print debug messages in production
 config :logger, level: :info
