@@ -10,7 +10,8 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :hangman, HangmanWeb.Endpoint,
-  url: [host: System.get_env("HOSTNAME"), port: 4000]
+  url: [host: System.get_env("HOSTNAME"), port: 4000],
+  :check_origin: false
 
 # Do not print debug messages in production
 config :logger, level: :info
