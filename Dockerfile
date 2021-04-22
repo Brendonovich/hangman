@@ -32,19 +32,4 @@ COPY lib /app/lib
 # compile app and create release
 RUN mix do compile, release
 
-####################################################################################################
-# STEP 2 - FINAL
-FROM alpine:3.13.2 as app
-RUN apk add --no-cache openssl ncurses-libs
-
-WORKDIR /app
-
-RUN chown nobody:nobody /app
-
-USER nobody:nobody
-
-COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/hangman ./
-
-ENV HOME=/app
-
-CMD bin/hangman start
+CMD mix phx.server
