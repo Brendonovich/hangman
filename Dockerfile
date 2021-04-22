@@ -19,6 +19,9 @@ WORKDIR /app
 # Install elixir package dependencies
 COPY mix.exs /app/mix.exs
 COPY mix.lock /app/mix.lock
+
+ENV SECRET_KEY_BASE ${SECRET_KEY_BASE}
+
 RUN mix do deps.get --only $MIX_ENV, deps.compile
 
 # copy config, priv and release and application directories
