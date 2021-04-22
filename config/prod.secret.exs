@@ -18,10 +18,12 @@ use Mix.Config
 
 secret_key_base =
   System.get_env("SECRET_KEY_BASE") ||
-    raise """
-    environment variable SECRET_KEY_BASE is missing.
-    You can generate one by calling: mix phx.gen.secret
-    """
+    "w3BCMFT1gS8NJ/BRBku/06tzA3W43iWqm0tkXXMif2UBEvZCTgifPMmY1KMH8OIp"
+
+# raise """
+# environment variable SECRET_KEY_BASE is missing.
+# You can generate one by calling: mix phx.gen.secret
+# """
 
 config :hangman, HangmanWeb.Endpoint,
   http: [
