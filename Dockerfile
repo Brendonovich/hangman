@@ -43,7 +43,7 @@ RUN chown nobody:nobody /app
 
 USER nobody:nobody
 
-COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/kousa ./
+COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/hangman ./
 
 ENV HOME=/app
 
