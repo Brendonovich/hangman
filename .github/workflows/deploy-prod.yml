@@ -10,6 +10,9 @@ on:
 jobs:
   dokku-build:
     runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: 'https://hangman.brendonovich.dev'
 
     steps:
       - name: Cloning repo
