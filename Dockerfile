@@ -26,9 +26,13 @@ RUN mix do deps.get --only $MIX_ENV, deps.compile
 COPY config /app/config
 COPY priv /app/priv
 COPY lib /app/lib
+COPY assets /app/assets
 
 # compile app and create release
 RUN mix do compile, release
+
+RUN npm run deploy --prefix ./assets
+RUN mix phx.digest
 
 EXPOSE 4000
 
