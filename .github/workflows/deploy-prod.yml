@@ -1,0 +1,24 @@
+name: deploy-prod
+
+on:
+  push:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+jobs:
+  dokku-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Dokku
+        uses: dokku/github-action@v1.0.1
+        with:
+          git_remote_url: ${{ secrets.GIT_URL }}
+          ssh_private_key: ${{ secrets.PRIVATE_KEY }}
