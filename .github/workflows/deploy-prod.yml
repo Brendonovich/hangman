@@ -22,4 +22,3 @@ jobs:
         with:
           git_remote_url: ${{ secrets.GIT_URL }}
           ssh_private_key: ${{ secrets.PRIVATE_KEY }}
-          ssh_host_key: ${{ secrets.PUBLIC_KEY }}
