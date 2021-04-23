@@ -15,6 +15,7 @@ RUN apk update && \
     npm install --global yarn
 
 ENV MIX_ENV=prod
+ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 WORKDIR /app
 
 
