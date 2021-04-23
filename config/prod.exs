@@ -12,6 +12,8 @@ use Mix.Config
 config :hangman, HangmanWeb.Endpoint,
   http: [port: {:system, "PORT"}]
 
+config :phoenix, :json_library, Jason
+
 # Do not print debug messages in production
 config :logger, level: :info
 
