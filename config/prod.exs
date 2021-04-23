@@ -10,9 +10,8 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :hangman, HangmanWeb.Endpoint,
-  http: [port: {:system, "PORT"}]
-
-config :phoenix, :json_library, Jason
+  http: [port: {:system, "PORT"}],
+  url: [host: "hangman.brendonovich.dev"]
 
 # Do not print debug messages in production
 config :logger, level: :info
