@@ -23,6 +23,7 @@ COPY mix.lock /app/mix.lock
 
 RUN mix do deps.get --only $MIX_ENV, deps.compile
 
+# copy assets directory & compile web assets
 COPY assets /app/assets
 RUN cd assets && yarn && yarn deploy
 RUN mix phx.digest
