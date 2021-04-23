@@ -11,7 +11,7 @@ RUN apk update && \
     nodejs-npm \ 
     python3 && \ 
     mix local.rebar --force && \
-    mix local.hex --force &&
+    mix local.hex --force && \
     npm install --global yarn
 
 ENV MIX_ENV=prod
