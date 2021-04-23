@@ -10,9 +10,7 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :hangman, HangmanWeb.Endpoint,
-  http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "elixir-hangman.herokuapp.com", port: 443],
-  force_ssl: [rewrite_on: [:x_forwarded_proto]]
+  http: [port: {:system, "PORT"}]
 
 # Do not print debug messages in production
 config :logger, level: :info
