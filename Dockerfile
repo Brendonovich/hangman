@@ -20,7 +20,6 @@ ENV TWITCH_USERNAME=${TWITCH_USERNAME}
 ENV TWITCH_TOKEN=${TWITCH_TOKEN}
 WORKDIR /app
 
-
 # Install elixir package dependencies
 COPY mix.exs /app/mix.exs
 COPY mix.lock /app/mix.lock
