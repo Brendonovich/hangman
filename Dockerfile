@@ -14,9 +14,18 @@ RUN apk update && \
     mix local.hex --force && \
     npm install --global yarn
 
-ENV MIX_ENV=prod
-
+RUN mkdir /app
 WORKDIR /app
+
+ENV MIX_ENV=prod
+RUN mkdir \ 
+    /app/_build/ \
+    /app/config/ \
+    /app/lib/ \
+    /app/priv/ \ 
+    /app/deps/ \
+    /app/rel/ \
+    /app/assets
 
 # Install elixir package dependencies
 COPY mix.exs /app/mix.exs
