@@ -22,12 +22,12 @@ WORKDIR /app
 COPY mix.exs /app/mix.exs
 COPY mix.lock /app/mix.lock
 COPY config /app/config
+COPY assets /app/assets
 
+RUN cd assets && yarn && yarn deploy
 RUN mix do deps.get, deps.compile
 
 COPY priv /app/priv
-COPY assets /app/assets
-RUN cd assets && yarn && yarn deploy
 RUN mix phx.digest
 
 COPY lib /app/lib
