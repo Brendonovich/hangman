@@ -2,7 +2,7 @@ defmodule HangmanWeb.PageLive do
   use Phoenix.HTML
   use HangmanWeb, :live_view
 
-  alias Hangman.{Game, ChatServer, PageLive}
+  alias Hangman.{Game, ChatServer}
 
   @impl true
   def mount(_params, _session, socket) do

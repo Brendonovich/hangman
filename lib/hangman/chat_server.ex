@@ -14,8 +14,7 @@ defmodule Hangman.ChatServer do
   end
 
   def handle_info({:connected, _port, _state}, state) do
-    IO.inspect("Logging in to twitch")
-
+    IO.inspect("Logging in to twitch with username #{state.username} and token #{state.token}")
 
     ExIRC.Client.logon(
       state.client,
