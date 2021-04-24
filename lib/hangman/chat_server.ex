@@ -7,7 +7,7 @@ defmodule Hangman.ChatServer do
     defstruct(
       host: "irc.chat.twitch.tv",
       port: 80,
-      username: String.downcase (Application.fetch_env!(:hangman, :twitch_username)),
+      username: String.downcase(Application.fetch_env!(:hangman, :twitch_username)),
       token: Application.fetch_env!(:hangman, :twitch_token),
       client: nil
     )
