@@ -20,7 +20,7 @@ defmodule Hangman.MixProject do
   def application do
     [
       mod: {Hangman.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :exirc]
     ]
   end
 
@@ -49,7 +49,8 @@ defmodule Hangman.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:exirc, "~> 2.0.0"},
       {:dictionary, "~> 0.1.0"},
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false}
     ]
   end
 

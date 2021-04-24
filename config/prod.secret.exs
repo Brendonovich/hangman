@@ -23,6 +23,8 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
+
+
 # raise """
 # environment variable SECRET_KEY_BASE is missing.
 # You can generate one by calling: mix phx.gen.secret
@@ -34,6 +36,11 @@ config :hangman, HangmanWeb.Endpoint,
     transport_options: [socket_opts: [:inet6]]
   ],
   secret_key_base: secret_key_base
+
+config :hangman,
+  username: System.get_env("TWITCH_USERNAME"),
+  token: System.get_env("TWITCH_TOKEN")
+
 
 # ## Using releases (Elixir v1.9+)
 #

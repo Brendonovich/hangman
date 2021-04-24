@@ -1,25 +1,27 @@
-<div class="flex justify-center items-center flex-col bg-gray-900 w-screen h-screen">
-    <h1 class="text-4xl mb-8 text-white">Hangman</h1>
-  <main class="px-8 py-6 bg-gray-800 rounded-xl text-white flex flex-col justify-center items-center space-y-2 text-xl">
-    <%= case @game.game_state do %>
-      <%= n when n in [:win, :lose] -> %>
-        <p><%= Enum.join(@game.letters, "") %></p>
-        <p>You <%= if n == :win, do: "Win", else: "Lose" %>!</p>
-        <button phx-click="new_game" class="bg-gray-700 rounded-md py-1 px-2">Play Again</button>
+<%= if @mounted do %>
+  <div class="flex justify-center items-center flex-col bg-gray-900 w-screen h-screen">
+  <h1 class="text-4xl mb-8 text-white">Hangman</h1>
+    <main class="px-8 py-6 bg-gray-800 rounded-xl text-white flex flex-col justify-center items-center space-y-2 text-xl">
+      <%= case @game.game_state do %>
+        <%= n when n in [:win, :lose] -> %>
+          <p><%= Enum.join(@game.letters, "") %></p>
+          <p>You <%= if n == :win, do: "Win", else: "Lose" %>!</p>
+          <button phx-click="new_game" class="bg-gray-700 rounded-md py-1 px-2">Play Again</button>
 
-      <% _ -> %>
-        <p class="tracking-widest"><%=  Hangman.Game.reveal_guessed(@game) %></p>
-        <p class="text-2xl">Attempts left: <%= @game.turns_left %></p>
+        <% _ -> %>
+          <p class="tracking-widest"><%=  Hangman.Game.reveal_guessed(@game) %></p>
+          <p class="text-2xl">Attempts left: <%= @game.turns_left %></p>
 
-        <div class="items-center grid-cols-13 grid grid-flow-row gap-2">
-          <%= for guess <- Map.to_list(@game.guesses) do %>
-            <%= if elem(guess, 1) == false do %>
-              <button class="p-1 bg-gray-300 text-black w-8 h-8 text-center rounded-md" phx-click="guess_letter" value="<%= elem(guess, 0) %>"><%= elem(guess, 0) %></button>
-            <% else %>
-              <p class="p-1 text-white w-8 h-8 text-center rounded-md"><%= elem(guess, 0) %></p>
+          <div class="items-center grid-cols-13 grid grid-flow-row gap-2">
+            <%= for guess <- Map.to_list(@game.guesses) do %>
+              <%= if elem(guess, 1) == false do %>
+                <button class="p-1 bg-gray-300 text-black w-8 h-8 text-center rounded-md" phx-click="guess_letter" value="<%= elem(guess, 0) %>"><%= elem(guess, 0) %></button>
+              <% else %>
+                <p class="p-1 text-white w-8 h-8 text-center rounded-md"><%= elem(guess, 0) %></p>
+              <% end %>
             <% end %>
-          <% end %>
-        </div>
-    <% end %>
-  </main>
-</div>
+          </div>
+      <% end %>
+    </main>
+  </div>
+<% end %>

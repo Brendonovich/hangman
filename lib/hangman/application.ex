@@ -10,11 +10,13 @@ defmodule Hangman.Application do
       # Start the Ecto repository
       # Hangman.Repo,
       # Start the Telemetry supervisor
-      HangmanWeb.Telemetry,
+      # HangmanWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Hangman.PubSub},
       # Start the Endpoint (http/https)
-      HangmanWeb.Endpoint
+      HangmanWeb.Endpoint,
+      {Registry, keys: :unique, name: Hangman.GameRegistry},
+      {DynamicSupervisor, strategy: :one_for_one, name: Hangman.GameSupervisor}
       # Start a worker by calling: Hangman.Worker.start_link(arg)
       # {Hangman.Worker, arg}
     ]
