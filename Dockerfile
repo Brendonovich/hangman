@@ -24,8 +24,8 @@ COPY mix.lock /app/mix.lock
 COPY config /app/config
 COPY assets /app/assets
 
-RUN cd assets && yarn && yarn deploy
 RUN mix do deps.get, deps.compile
+RUN cd assets && yarn && yarn deploy
 
 COPY priv /app/priv
 RUN mix phx.digest
