@@ -57,8 +57,7 @@ RUN cd /app/assets && \
     yarn install 
 
 # assets -- copy asset files so purgecss doesnt remove css files
-COPY lib/hangman_web/templates/ /app/lib/hangman_web/templates/
-COPY lib/hangman_web/views/ /app/lib/hangman_web/views/
+COPY lib/hangman_web/ /app/lib/hangman_web/
 
 # assets -- build assets
 COPY assets /app/assets

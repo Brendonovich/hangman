@@ -9,7 +9,7 @@ defmodule Hangman.ChatServer do
       token: nil,
       client: nil,
       host: "irc.chat.twitch.tv",
-      port: 80
+      port: 6667
     )
   end
 
@@ -45,7 +45,8 @@ defmodule Hangman.ChatServer do
     {:noreply, state}
   end
 
-  def handle_info(_info, state) do
+  def handle_info(info, state) do
+    IO.inspect(info)
     {:noreply, state}
   end
 
