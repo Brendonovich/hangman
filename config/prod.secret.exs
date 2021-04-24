@@ -2,8 +2,7 @@
 # from environment variables. You can also hardcode secrets,
 # although such is generally not recommended and you have to
 # remember to add this file to your .gitignore.
-use Mix.Config
-
+import Config
 # database_url =
 #   System.get_env("DATABASE_URL") ||
 #     raise """
@@ -23,8 +22,6 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
-
-
 # raise """
 # environment variable SECRET_KEY_BASE is missing.
 # You can generate one by calling: mix phx.gen.secret
@@ -37,10 +34,19 @@ config :hangman, HangmanWeb.Endpoint,
   ],
   secret_key_base: secret_key_base
 
-config :hangman,
-  twitch_username: System.get_env("TWITCH_USERNAME"),
-  twitch_token: System.get_env("TWITCH_TOKEN")
 
+
+twitch_username =
+  System.get_env("TWITCH_USERNAME") ||
+    raise "environment variable TWITCH_USERNAME is missing."
+
+twitch_token =
+  System.get_env("TWITCH_TOKEN") ||
+    raise "environment variable TWITCH_TOKEN is missing."
+
+config :hangman,
+  twitch_username: twitch_username,
+  twitch_token: twitch_token
 
 # ## Using releases (Elixir v1.9+)
 #
