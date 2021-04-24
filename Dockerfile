@@ -1,5 +1,5 @@
 # STEP 1 - BUILD RELEASE 
-FROM hexpm/elixir:1.11.3-erlang-23.2.7-alpine-3.13.2 AS build
+FROM hexpm/elixir:1.11.3-erlang-23.2.7-alpine-3.13.2 AS deps-getter
 
 # Install build dependencies
 RUN apk update && \
@@ -21,34 +21,94 @@ WORKDIR /app
 # Install elixir package dependencies
 COPY mix.exs /app/mix.exs
 COPY mix.lock /app/mix.lock
-COPY config /app/config
-COPY assets /app/assets
 
-RUN mix do deps.get, deps.compile
-RUN cd assets && yarn && yarn deploy
+# install deps and compile deps
+COPY mix.exs /app/mix.exs
+COPY mix.lock /app/mix.lock
+RUN mix do deps.get --only $MIX_ENV, deps.compile
+RUN mix compile
 
-COPY priv /app/priv
-RUN mix phx.digest
+# STEP 2 - ASSET BUILDER
+FROM node:10 AS asset-builder
 
-COPY lib /app/lib
-
-# compile app and create release
-RUN mix do compile, release
-
-# prepare release image
-FROM alpine:3.9 AS app
-RUN apk add --no-cache openssl ncurses-libs
-
+RUN mkdir /app
 WORKDIR /app
 
-RUN chown nobody:nobody /app
+# install latest version of yarn
+RUN npm i -g yarn --force
 
-USER nobody:nobody
+COPY --from=deps-getter /app/assets /app/assets
+COPY --from=deps-getter /app/priv /app/priv
+COPY --from=deps-getter /app/deps /app/deps
 
-COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/hangman ./
+# assets -- install javascript deps
+COPY assets/package.json /app/assets/package.json
+COPY assets/yarn.lock /app/assets/yarn.lock
+RUN cd /app/assets && \
+    yarn install 
 
-ENV HOME=/app
+# assets -- copy asset files so purgecss doesnt remove css files
+COPY lib/hangman/templates/ /app/lib/hangman/templates/
+COPY lib/hangman/views/ /app/lib/hangman/views/
+
+# assets -- build assets
+COPY assets /app/assets
+RUN cd /app/assets && yarn deploy  
+
+
+################################################################################
+# STEP 3 - RELEASE BUILDER
+FROM hexpm/elixir:1.11.3-erlang-23.2.7-alpine-3.13.2  AS release-builder
+
+ENV MIX_ENV=prod
+
+RUN mkdir /app
+WORKDIR /app
+
+# need to install deps again to run mix phx.digest
+RUN apk update && \
+    apk upgrade --no-cache && \
+    apk add --no-cache \
+    git \
+    build-base && \
+    mix local.rebar --force && \
+    mix local.hex --force
+
+# copy elixir deps
+COPY --from=deps-getter /app /app
+
+# copy config, priv and release directories
+COPY config /app/config
+COPY priv /app/priv
+COPY rel /app/rel
+
+# copy built assets
+COPY --from=asset-builder /app/priv/static /app/priv/static
+
+RUN mix phx.digest
+
+# copy application code
+COPY lib /app/lib
+
+# create release
+RUN mkdir -p /opt/built &&\
+    mix release &&\
+    cp -r _build/prod/rel/hangman /opt/built
+
+################################################################################
+## STEP 4 - FINAL
+FROM alpine:3.11.3
+
+ENV MIX_ENV=prod
+
+RUN apk update && \
+    apk add --no-cache \
+    bash \
+    openssl-dev
+
+COPY --from=release-builder /opt/built /app
+WORKDIR /app
 
 EXPOSE 4000
 
-CMD ["bin/hangman", "start"]
+CMD ["/app/hangman/bin/hangman", "start"]
