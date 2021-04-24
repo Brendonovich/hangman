@@ -38,7 +38,7 @@ RUN mix do deps.get --only $MIX_ENV, deps.compile
 RUN mix compile
 
 # STEP 2 - ASSET BUILDER
-FROM node:10 AS asset-builder
+FROM node:12 AS asset-builder
 
 RUN mkdir /app
 WORKDIR /app
