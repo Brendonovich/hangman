@@ -38,8 +38,8 @@ config :hangman, HangmanWeb.Endpoint,
   secret_key_base: secret_key_base
 
 config :hangman,
-  username: System.get_env("TWITCH_USERNAME"),
-  token: System.get_env("TWITCH_TOKEN")
+  twitch_username: System.get_env("TWITCH_USERNAME"),
+  twitch_token: System.get_env("TWITCH_TOKEN")
 
 
 # ## Using releases (Elixir v1.9+)
