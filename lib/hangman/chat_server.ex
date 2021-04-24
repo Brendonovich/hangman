@@ -5,11 +5,11 @@ defmodule Hangman.ChatServer do
 
   defmodule State do
     defstruct(
+      username: nil,
+      token: nil,
+      client: nil,
       host: "irc.chat.twitch.tv",
-      port: 80,
-      username: Application.get_env(:hangman, :twitch_username),
-      token: Application.get_env(:hangman, :twitch_token),
-      client: nil
+      port: 80
     )
   end
 
@@ -51,7 +51,16 @@ defmodule Hangman.ChatServer do
 
   def start_link(name: name) do
     {:ok, client} = ExIRC.start_link!()
-    GenServer.start_link(__MODULE__, %{%State{} | client: client}, name: name)
+
+    GenServer.start_link(
+      __MODULE__,
+      %State{
+        client: client,
+        username: get_env(:twitch_username),
+        token: get_env(:twitch_token)
+      },
+      name: name
+    )
   end
 
   def init(state) do
@@ -64,4 +73,11 @@ defmodule Hangman.ChatServer do
     do: Phoenix.PubSub.broadcast!(PubSub, "chat:#{state.username}", value)
 
   defp connect(state), do: ExIRC.Client.connect!(state.client, state.host, state.port)
+
+  defp get_env(name) do
+    case Application.get_env(:hangman, name) do
+      {:ok, value} -> value
+      _ -> nil
+    end
+  end
 end
