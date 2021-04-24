@@ -34,14 +34,12 @@ config :hangman, HangmanWeb.Endpoint,
   ],
   secret_key_base: secret_key_base
 
-
-
 twitch_username =
-  System.get_env("TWITCH_USERNAME") ||
+  System.fetch_env("TWITCH_USERNAME") ||
     raise "environment variable TWITCH_USERNAME is missing."
 
 twitch_token =
-  System.get_env("TWITCH_TOKEN") ||
+  System.fetch_env("TWITCH_TOKEN") ||
     raise "environment variable TWITCH_TOKEN is missing."
 
 config :hangman,
@@ -53,7 +51,9 @@ config :hangman,
 # If you are doing OTP releases, you need to instruct Phoenix
 # to start each relevant endpoint:
 #
-#     config :hangman, HangmanWeb.Endpoint, server: true
+
+config :hangman, HangmanWeb.Endpoint, server: true
+
 #
 # Then you can assemble a release by calling `mix release`.
 # See `mix help release` for more information.

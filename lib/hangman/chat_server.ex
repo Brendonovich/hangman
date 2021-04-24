@@ -7,8 +7,8 @@ defmodule Hangman.ChatServer do
     defstruct(
       host: "irc.chat.twitch.tv",
       port: 80,
-      username: String.downcase(Application.fetch_env!(:hangman, :twitch_username)),
-      token: Application.fetch_env!(:hangman, :twitch_token),
+      username: Application.get_env(:hangman, :twitch_username),
+      token: Application.get_env(:hangman, :twitch_token),
       client: nil
     )
   end
@@ -28,7 +28,7 @@ defmodule Hangman.ChatServer do
   end
 
   def handle_info(:logged_in, state) do
-    ExIRC.Client.join(state.client, "##{state.username}")
+    ExIRC.Client.join(state.client, "##{String.downcase(state.username)}")
     broadcast(state, {:connection, :connected})
 
     {:noreply, state}
@@ -60,7 +60,8 @@ defmodule Hangman.ChatServer do
     {:ok, state}
   end
 
-  defp broadcast(state, value), do: Phoenix.PubSub.broadcast!(PubSub, "chat:#{state.username}", value)
+  defp broadcast(state, value),
+    do: Phoenix.PubSub.broadcast!(PubSub, "chat:#{state.username}", value)
 
   defp connect(state), do: ExIRC.Client.connect!(state.client, state.host, state.port)
 end

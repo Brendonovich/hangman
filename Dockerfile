@@ -15,30 +15,40 @@ RUN apk update && \
     npm install --global yarn
 
 ENV MIX_ENV=prod
-ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
-ENV TWITCH_USERNAME=${TWITCH_USERNAME}
-ENV TWITCH_TOKEN=${TWITCH_TOKEN}
+
 WORKDIR /app
 
 # Install elixir package dependencies
 COPY mix.exs /app/mix.exs
 COPY mix.lock /app/mix.lock
-
-RUN mix do deps.get --only $MIX_ENV, deps.compile
-
-# copy config, priv and release and application directories
 COPY config /app/config
-COPY priv /app/priv
-COPY lib /app/lib
 
-# copy assets directory & compile web assets
+RUN mix do deps.get, deps.compile
+
+COPY priv /app/priv
 COPY assets /app/assets
 RUN cd assets && yarn && yarn deploy
 RUN mix phx.digest
 
+COPY lib /app/lib
+
 # compile app and create release
 RUN mix do compile, release
 
+# prepare release image
+FROM alpine:3.9 AS app
+RUN apk add --no-cache openssl ncurses-libs
+
+WORKDIR /app
+
+RUN chown nobody:nobody /app
+
+USER nobody:nobody
+
+COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/hangman ./
+
+ENV HOME=/app
+
 EXPOSE 4000
 
-CMD mix phx.server
+CMD ["bin/hangman", "start"]
