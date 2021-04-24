@@ -89,7 +89,6 @@ COPY --from=deps-getter /app /app
 # copy config, priv and release directories
 COPY config /app/config
 COPY priv /app/priv
-COPY rel /app/rel
 
 # copy built assets
 COPY --from=asset-builder /app/priv/static /app/priv/static
