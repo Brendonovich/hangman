@@ -27,8 +27,8 @@
             <u><a class="text-blue-300"
                target="_blank"
                rel="noreferrer noopener"
-               href="https://twitch.tv/<%= Application.get_env(:hangman, :twitch_username) %>">
-              https://twitch.tv/<%= Application.get_env(:hangman, :twitch_username) %>
+               href="https://twitch.tv/<%= Hangman.Utilities.get_env(:twitch_username) %>">
+              https://twitch.tv/<%= Hangman.Utilities.get_env(:twitch_username) %>
             <a></u>
             and make guesses in chat!
           </p>

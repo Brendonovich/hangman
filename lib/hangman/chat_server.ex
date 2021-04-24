@@ -1,7 +1,7 @@
 defmodule Hangman.ChatServer do
   use GenServer
 
-  alias Hangman.PubSub
+  alias Hangman.{PubSub, Utilities}
 
   defmodule State do
     defstruct(
@@ -56,8 +56,8 @@ defmodule Hangman.ChatServer do
       __MODULE__,
       %State{
         client: client,
-        username: get_env(:twitch_username),
-        token: get_env(:twitch_token)
+        username: Utilities.get_env(:twitch_username),
+        token: Utilities.get_env(:twitch_token)
       },
       name: name
     )
@@ -74,10 +74,4 @@ defmodule Hangman.ChatServer do
 
   defp connect(state), do: ExIRC.Client.connect!(state.client, state.host, state.port)
 
-  defp get_env(name) do
-    case Application.get_env(:hangman, name) do
-      {:ok, value} -> value
-      _ -> nil
-    end
-  end
 end
