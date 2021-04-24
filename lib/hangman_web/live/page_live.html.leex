@@ -21,6 +21,17 @@
               <% end %>
             <% end %>
           </div>
+
+          <p class="max-w-md text-center">
+            You can also go to
+            <u><a class="text-blue-300"
+               target="_blank"
+               rel="noreferrer noopener"
+               href="https://twitch.tv/<%= Application.get_env(:hangman, :twitch_username) %>">
+              https://twitch.tv/<%= Application.get_env(:hangman, :twitch_username) %>
+            <a></u>
+            and make guesses in chat!
+          </p>
       <% end %>
     </main>
   </div>
