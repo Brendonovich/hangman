@@ -29,8 +29,8 @@ config :hangman, HangmanWeb.Endpoint,
   secret_key_base: get_system_env("SECRET_KEY_BASE")
 
 config :hangman,
-  twitch_client_id: get_system_env("TWITCH_CLIENT_ID")
-  twitch_client_secret: get_system_env("TWITCH_CLIENT_SECRET")
+  twitch_client_id: get_system_env("TWITCH_CLIENT_ID"),
+  twitch_client_secret: get_system_env("TWITCH_CLIENT_SECRET"),
   twitch_redirect_uri: get_system_env("TWITCH_REDIRECT_URI")
 
 config :hangman, HangmanWeb.Endpoint, server: true
