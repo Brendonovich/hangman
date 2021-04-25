@@ -1,0 +1,4 @@
+<div class="text-center p-8">
+  <h1 class="text-6xl mb-2">Welcome to Hangman on Stream!</h1>
+  <p class="text-2xl">To get started, <a class="text-purple-400" href="<%= twitch_auth_link() %>">sign in with Twitch</a></p>
+</div>

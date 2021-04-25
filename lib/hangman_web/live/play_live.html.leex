@@ -1,0 +1,26 @@
+<%= if @mounted do %>
+  <h1 class="text-4xl mb-8 text-center">Hangman on Stream</h1>
+  <main class="px-8 py-6 bg-gray-800 rounded-xl flex flex-col justify-center items-center space-y-2 text-xl">
+    <%= case @game.game_state do %>
+      <%= n when n in [:win, :lose] -> %>
+        <p><%= Enum.join(@game.letters, "") %></p>
+        <p>You <%= if n == :win, do: "Win", else: "Lose" %>!</p>
+        <button phx-click="new_game" class="bg-gray-700 rounded-md py-1 px-2">Play Again</button>
+
+      <% _ -> %>
+        <p class="tracking-widest text-4xl"><%=  Hangman.Game.reveal_guessed(@game) %></p>
+        <p class="text-2xl">Attempts left: <%= @game.turns_left %></p>
+
+        <p class="max-w-md text-center">
+          Go to
+          <u><a class="text-blue-300"
+             target="_blank"
+             rel="noreferrer noopener"
+             href="https://twitch.tv/<%= @twitch_username %>">
+            https://twitch.tv/<%= @twitch_username %>
+          <a></u>
+          to guess the word!
+        </p>
+    <% end %>
+  </main>
+<% end %>

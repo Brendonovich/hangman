@@ -15,45 +15,22 @@ import Config
 #   url: database_url,
 #   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-secret_key_base =
-  System.get_env("SECRET_KEY_BASE") ||
-    raise """
-    environment variable SECRET_KEY_BASE is missing.
-    You can generate one by calling: mix phx.gen.secret
-    """
+def get_system_env(name), do:
+  System.get_env(name) ||
+    raise "environment variable #{name} is missing."
 
-# raise """
-# environment variable SECRET_KEY_BASE is missing.
-# You can generate one by calling: mix phx.gen.secret
-# """
+
 
 config :hangman, HangmanWeb.Endpoint,
   http: [
     port: String.to_integer(System.get_env("PORT") || "4000"),
     transport_options: [socket_opts: [:inet6]]
   ],
-  secret_key_base: secret_key_base
-
-twitch_username =
-  System.fetch_env("TWITCH_USERNAME") ||
-    raise "environment variable TWITCH_USERNAME is missing."
-
-twitch_token =
-  System.fetch_env("TWITCH_TOKEN") ||
-    raise "environment variable TWITCH_TOKEN is missing."
+  secret_key_base: get_system_env("SECRET_KEY_BASE")
 
 config :hangman,
-  twitch_username: twitch_username,
-  twitch_token: twitch_token
-
-# ## Using releases (Elixir v1.9+)
-#
-# If you are doing OTP releases, you need to instruct Phoenix
-# to start each relevant endpoint:
-#
+  twitch_client_id: get_system_env("TWITCH_CLIENT_ID")
+  twitch_client_secret: get_system_env("TWITCH_CLIENT_SECRET")
+  twitch_redirect_uri: get_system_env("TWITCH_REDIRECT_URI")
 
 config :hangman, HangmanWeb.Endpoint, server: true
-
-#
-# Then you can assemble a release by calling `mix release`.
-# See `mix help release` for more information.

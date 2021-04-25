@@ -1,6 +1,8 @@
 defmodule HangmanWeb.Router do
   use HangmanWeb, :router
 
+  import HangmanWeb.OauthController
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -15,9 +17,21 @@ defmodule HangmanWeb.Router do
   end
 
   scope "/", HangmanWeb do
+    pipe_through [:browser, :redirect_if_authenticated]
+
+    get "/", PageController, :index
+  end
+
+  scope "/twitch", HangmanWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    get "/redirect", OauthController, :redirect
+  end
+
+  scope "/play", HangmanWeb do
+    pipe_through [:browser, :authenticated]
+
+    live "/", PlayLive, :index
   end
 
   # Other scopes may use custom stacks.

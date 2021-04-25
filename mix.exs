@@ -33,6 +33,7 @@ defmodule Hangman.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 2.0"},
       {:phoenix, "~> 1.5.8"},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
@@ -50,7 +51,7 @@ defmodule Hangman.MixProject do
       {:exirc, "~> 2.0.0"},
       {:dictionary, "~> 0.1.0"},
       {:poison, "~> 3.1"},
-      {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false}
+      {:httpoison, "~> 1.8"}
     ]
   end
 

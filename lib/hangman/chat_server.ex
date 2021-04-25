@@ -1,7 +1,7 @@
 defmodule Hangman.ChatServer do
   use GenServer
 
-  alias Hangman.{PubSub, Utilities}
+  alias Hangman.{PubSub}
 
   defmodule State do
     defstruct(
@@ -28,7 +28,7 @@ defmodule Hangman.ChatServer do
   end
 
   def handle_info(:logged_in, state) do
-    ExIRC.Client.join(state.client, "##{String.downcase(state.username)}")
+    ExIRC.Client.join(state.client, "##{state.username}")
     broadcast(state, {:connection, :connected})
 
     {:noreply, state}
@@ -50,15 +50,21 @@ defmodule Hangman.ChatServer do
     {:noreply, state}
   end
 
-  def start_link(name: name) do
+  def start_link(name: name, username: username, token: token) do
     {:ok, client} = ExIRC.start_link!()
+
+    formattedToken =
+      case token do
+        "oauth:" <> _ -> token
+        t -> "oauth:#{t}"
+      end
 
     GenServer.start_link(
       __MODULE__,
       %State{
         client: client,
-        username: Utilities.get_env(:twitch_username),
-        token: Utilities.get_env(:twitch_token)
+        username: username,
+        token: formattedToken
       },
       name: name
     )
@@ -74,5 +80,4 @@ defmodule Hangman.ChatServer do
     do: Phoenix.PubSub.broadcast!(PubSub, "chat:#{state.username}", value)
 
   defp connect(state), do: ExIRC.Client.connect!(state.client, state.host, state.port)
-
 end

@@ -10,6 +10,8 @@
     <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
   <body>
-    <%= @inner_content %>
+    <div class="w-screen h-screen bg-gray-900 text-white flex flex-col justify-center items-center">
+      <%= @inner_content %>
+    <div>
   </body>
 </html>

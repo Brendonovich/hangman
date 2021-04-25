@@ -1,22 +1,25 @@
-defmodule HangmanWeb.PageLive do
+defmodule HangmanWeb.PlayLive do
   use Phoenix.HTML
   use HangmanWeb, :live_view
 
   alias Hangman.{Game, ChatServer}
 
   @impl true
-  def mount(_params, _session, socket) do
-    name = "brendonovich"
+  def mount(_params, session, socket) do
+    %{
+      "current_user" => username,
+      "access_token" => token
+    } = session
 
-    Phoenix.PubSub.subscribe(Hangman.PubSub, "chat:#{name}")
+    Phoenix.PubSub.subscribe(Hangman.PubSub, "chat:#{username}")
 
     case Phoenix.LiveView.connected?(socket) do
       true ->
-        case Registry.lookup(Hangman.GameRegistry, name) do
+        case Registry.lookup(Hangman.GameRegistry, username) do
           [] ->
             DynamicSupervisor.start_child(
               Hangman.GameSupervisor,
-              {ChatServer, name: via_tuple(name)}
+              {ChatServer, name: via_tuple(username), username: username, token: token}
             )
 
           _ ->
@@ -26,7 +29,8 @@ defmodule HangmanWeb.PageLive do
         {:ok,
          assign(socket,
            mounted: true,
-           game: Game.new_game()
+           game: Game.new_game(),
+           twitch_username: username
          )}
 
       false ->
@@ -61,10 +65,10 @@ defmodule HangmanWeb.PageLive do
     {:noreply, socket}
   end
 
+  defp guess_letter(letter, %{assigns: %{game: game}} = socket),
+    do: {:noreply, assign(socket, game: Game.guess_letter(game, letter))}
+
   defp via_tuple(name) do
     {:via, Registry, {Hangman.GameRegistry, name}}
   end
-
-  defp guess_letter(letter, %{assigns: %{game: game}} = socket),
-    do: {:noreply, assign(socket, game: Game.guess_letter(game, letter))}
 end
