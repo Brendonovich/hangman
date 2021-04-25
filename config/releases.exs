@@ -3,6 +3,7 @@
 # although such is generally not recommended and you have to
 # remember to add this file to your .gitignore.
 import Config
+import Hangman.Utilities
 # database_url =
 #   System.get_env("DATABASE_URL") ||
 #     raise """
@@ -14,10 +15,6 @@ import Config
 #   # ssl: true,
 #   url: database_url,
 #   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
-
-def get_system_env(name), do:
-  System.get_env(name) ||
-    raise "environment variable #{name} is missing."
 
 
 

@@ -6,4 +6,9 @@ defmodule Hangman.Utilities do
       response
       |> Map.get(:body)
       |> Poison.decode!()
+
+  def get_system_env(name),
+    do:
+      System.get_env(name) ||
+        raise("environment variable #{name} is missing.")
 end
