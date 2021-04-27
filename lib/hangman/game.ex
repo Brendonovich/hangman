@@ -33,12 +33,14 @@ defmodule Hangman.Game do
   defp _guess_letter(game, _letter, _already_gessed = true),
     do: Map.put(game, :game_state, :already_guessed)
 
-  defp _guess_letter(game, letter, _already_gessed),
-    do:
+  defp _guess_letter(game, letter, _already_gessed) do
+    if(!(game.game_state in [:win, :lose])) do
       process_guess(
         Map.put(game, :guesses, Map.put(game.guesses, letter, true)),
         Enum.member?(game.letters, letter)
       )
+    end
+  end
 
   defp process_guess(game, _good_guess = true),
     do:
