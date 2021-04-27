@@ -56,8 +56,8 @@ defmodule HangmanWeb.PlayLive do
   end
 
   @impl true
-  def handle_info({:message, message}, socket) do
-    guess_letter(String.first(message), socket)
+  def handle_info({:message, "!guess " <> letter}, socket) do
+    guess_letter(String.first(letter), socket)
   end
 
   @impl true
