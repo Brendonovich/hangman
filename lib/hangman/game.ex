@@ -1,28 +1,48 @@
 defmodule Hangman.Game do
-  defstruct turns_left: 6,
-            # The word, split into chars
-            letters: [],
-            # All currently guessed letters
-            guesses: Map.new(?A..?Z, fn l -> {<<l::utf8>>, false} end),
-            # State of game, can be :initializing, :good_guess, :bad_guess, :already_guessed, :win, :loss
-            game_state: :initializing
+  @type t :: %{
+          turns_left: number(),
+          letters: list(binary()),
+          guesses: map(),
+          game_state: :initializing
+        }
 
-  def new_game(word), do: %Hangman.Game{letters: word |> String.upcase() |> String.codepoints()}
+  defstruct(
+    turns_left: 6,
+    # The word, split into chars
+    letters: [],
+    # All currently guessed letters
+    guesses: Map.new(?A..?Z, fn l -> {<<l::utf8>>, false} end),
+    # State of game, can be :initializing, :good_guess, :bad_guess, :already_guessed, :win, :loss
+    game_state: :initializing
+  )
+
+  def new_game(word),
+    do: %Hangman.Game{
+      letters:
+        word
+        |> String.upcase()
+        |> String.codepoints()
+    }
 
   def new_game(), do: new_game(Dictionary.random_word())
 
+  @spec guess_letter(t(), String.t()) :: t()
   def guess_letter(game, letter) do
-    if(!(game.game_state in [:win, :lose])) do
-      capital_letter =
-        letter
-        |> String.first()
-        |> String.capitalize()
+    case game.game_state do
+      n when n in [:win, :lose] ->
+        normalised_letter =
+          letter
+          |> String.first()
+          |> String.capitalize()
 
-      _guess_letter(
-        game,
-        capital_letter,
-        Map.get(game.guesses, capital_letter)
-      )
+        _guess_letter(
+          game,
+          normalised_letter,
+          Map.get(game.guesses, normalised_letter)
+        )
+
+      _ ->
+        game
     end
   end
 
