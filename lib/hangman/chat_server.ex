@@ -29,13 +29,12 @@ defmodule Hangman.ChatServer do
 
   def handle_info(:logged_in, state) do
     ExIRC.Client.join(state.client, "##{state.username}")
-    broadcast(state, {:connection, :connected})
 
     {:noreply, state}
   end
 
-  def handle_info({:received, msg, _conn, _channel}, state) do
-    broadcast(state, {:message, msg})
+  def handle_info({:received, msg, %{:user => user} = _conn, _channel}, state) do
+    broadcast(state, {:message, user, msg})
     {:noreply, state}
   end
 
@@ -50,23 +49,17 @@ defmodule Hangman.ChatServer do
     {:noreply, state}
   end
 
-  def start_link(name: name, username: username, token: token) do
+  def start_link(username, token) do
     {:ok, client} = ExIRC.start_link!()
-
-    formattedToken =
-      case token do
-        "oauth:" <> _ -> token
-        t -> "oauth:#{t}"
-      end
 
     GenServer.start_link(
       __MODULE__,
       %State{
         client: client,
         username: username,
-        token: formattedToken
+        token: "oauth:#{token}"
       },
-      name: name
+      name: via_tuple(username)
     )
   end
 
@@ -80,4 +73,8 @@ defmodule Hangman.ChatServer do
     do: Phoenix.PubSub.broadcast!(PubSub, "chat:#{state.username}", value)
 
   defp connect(state), do: ExIRC.Client.connect!(state.client, state.host, state.port)
+
+  defp via_tuple(name) do
+    {:via, Registry, {:chat_server_registry, name}}
+  end
 end

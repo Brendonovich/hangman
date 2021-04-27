@@ -18,13 +18,21 @@ defmodule Hangman.GameSupervisor do
   using `restart: :temporary`.
   """
   def create_game(name) do
+    id =
+      :crypto.strong_rand_bytes(8)
+      |> Base.url_encode64()
+      |> binary_part(0, 8)
+
+    server_name = "#{name}-#{id}"
+
     child_spec = %{
       id: GameServer,
-      start: {GameServer, :start_link, [name]},
+      start: {GameServer, :start_link, [server_name]},
       restart: :temporary
     }
 
-    DynamicSupervisor.start_child(__MODULE__, child_spec)
+    {:ok, pid} = DynamicSupervisor.start_child(__MODULE__, child_spec)
+    {:ok, pid, server_name}
   end
 
   @doc """

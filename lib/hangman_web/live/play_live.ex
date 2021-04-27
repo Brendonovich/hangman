@@ -2,7 +2,8 @@ defmodule HangmanWeb.PlayLive do
   use Phoenix.HTML
   use HangmanWeb, :live_view
 
-  alias Hangman.{Game, ChatServer}
+  alias Phoenix.PubSub
+  alias Hangman.GameServer
 
   @impl true
   def mount(_params, session, socket) do
@@ -11,64 +12,105 @@ defmodule HangmanWeb.PlayLive do
       "access_token" => token
     } = session
 
-    Phoenix.PubSub.subscribe(Hangman.PubSub, "chat:#{username}")
+    if(connected?(socket)) do
+      game_name = Hangman.create_game(username, token)
 
-    case Phoenix.LiveView.connected?(socket) do
-      true ->
-        case Registry.lookup(Hangman.GameRegistry, username) do
-          [] ->
-            DynamicSupervisor.start_child(
-              Hangman.GameSupervisor,
-              {ChatServer, name: via_tuple(username), username: username, token: token}
-            )
+      PubSub.subscribe(Hangman.PubSub, "chat:#{username}")
+      PubSub.subscribe(Hangman.PubSub, "game:#{game_name}")
 
-          _ ->
-            nil
-        end
-
-        {:ok,
-         assign(socket,
-           mounted: true,
-           game: Game.new_game(),
-           twitch_username: username
-         )}
-
-      false ->
-        {:ok, assign(socket, mounted: false)}
+      {:ok,
+       assign(socket,
+         state: :waiting,
+         game_name: game_name,
+         game: GameServer.game(game_name)
+       )}
+    else
+      {:ok,
+       assign(socket,
+         state: :waiting,
+         game: %Hangman.Game{}
+       )}
     end
   end
 
   @impl true
-  def handle_event("guess_letter", %{"value" => letter}, socket),
-    do: guess_letter(letter, socket)
+  def handle_event("start_game", _params, socket) do
+    game_name = socket.assigns.game_name
 
-  @impl true
-  def handle_event("new_game", _args, socket) do
-    {:noreply, assign(socket, game: Game.new_game())}
+    GameServer.start_game(game_name)
+
+    {:noreply,
+     assign(socket,
+       game: GameServer.game(socket.assigns.game_name),
+       state: :playing,
+       guess_counts: %{},
+       total_count: 0
+     )}
+  end
+
+  def handle_event("new_game", _params, socket) do
+    {:noreply, assign(socket, state: :waiting)}
   end
 
   @impl true
-  def handle_info(msg = %{type: "connection"}, socket) do
-    case msg.value do
-      :connected -> {:noreply, assign(socket, status: :connected)}
-      _ -> {:noreply, socket}
+  def handle_event("submit_guess", _params, socket) do
+    most_voted_letter =
+      socket.assigns.guess_counts
+      |> Hangman.Utilities.sort_guesses_map()
+      |> List.first()
+      |> elem(0)
+
+    {:ok, %{:game => game}} = GameServer.guess_letter(socket.assigns.game_name, most_voted_letter)
+
+    {:noreply, assign(socket, game: game)}
+  end
+
+  @impl true
+  def handle_event("next_round", _params, socket) do
+    {:ok, %{:game => game, :guess_counts => guess_counts}} =
+      GameServer.continue_guessing(socket.assigns.game_name)
+
+    {:noreply, assign(socket, game: game, guess_counts: guess_counts, total_count: 0)}
+  end
+
+  @impl true
+  def handle_info({:message, user, "!guess " <> msg}, socket) do
+    if(socket.assigns.game.state == :guessing) do
+      GameServer.register_user_guess(socket.assigns.game_name, user, msg)
+
+      PubSub.broadcast!(
+        Hangman.PubSub,
+        "game:#{socket.assigns.game_name}",
+        {:guess_counts_updated}
+      )
     end
-  end
 
-  @impl true
-  def handle_info({:message, "!guess " <> letter}, socket) do
-    guess_letter(String.first(letter), socket)
-  end
-
-  @impl true
-  def handle_info(_info, socket) do
     {:noreply, socket}
   end
 
-  defp guess_letter(letter, %{assigns: %{game: game}} = socket),
-    do: {:noreply, assign(socket, game: Game.guess_letter(game, letter))}
+  @impl true
+  def handle_info({:message, _user, _msg}, socket) do
+    {:noreply, socket}
+  end
 
-  defp via_tuple(name) do
-    {:via, Registry, {Hangman.GameRegistry, name}}
+  def handle_info({:guess_counts_updated}, socket) do
+    {:ok, %{:guess_counts => guess_counts, :total_count => total_count}} =
+      GameServer.guess_counts(socket.assigns.game_name)
+
+    {:noreply,
+     assign(socket,
+       guess_counts: guess_counts,
+       total_count: total_count
+     )}
+  end
+
+  @impl true
+  def handle_info({:guess_timer_updated, time}, socket) do
+    {:noreply, assign(socket, guess_time: time)}
+  end
+
+  @impl true
+  def handle_info(:new_guess, socket) do
+    {:noreply, assign(socket, guess_state: :guessing)}
   end
 end

@@ -7,7 +7,8 @@ defmodule HangmanWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_hangman_key",
-    signing_salt: "llPJ62je"
+    signing_salt: "llPJ62je",
+    encryption_salt: Hangman.Utilities.get_env(:secret_key_base)
   ]
 
   socket "/socket", HangmanWeb.UserSocket,

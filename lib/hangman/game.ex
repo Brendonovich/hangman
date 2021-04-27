@@ -1,34 +1,36 @@
 defmodule Hangman.Game do
-  @type t :: %{
-          turns_left: number(),
-          letters: list(binary()),
-          guesses: map(),
-          game_state: :initializing
-        }
+  @type t ::
+          %__MODULE__{
+            turns_left: number,
+            letters: list(String.t()),
+            guesses: MapSet.t(),
+            state: atom()
+          }
 
-  defstruct(
-    turns_left: 6,
-    # The word, split into chars
-    letters: [],
-    # All currently guessed letters
-    guesses: Map.new(?A..?Z, fn l -> {<<l::utf8>>, false} end),
-    # State of game, can be :initializing, :good_guess, :bad_guess, :already_guessed, :win, :loss
-    game_state: :initializing
-  )
+  defstruct turns_left: 6,
+            # The word, split into chars
+            letters: [],
+            # All currently guessed letters
+            guesses: MapSet.new(),
+            # State of game, can be :guessing, :good_guess, :bad_guess, :already_guessed, :win, :loss
+            state: :guessing
 
-  def new_game(word),
-    do: %Hangman.Game{
+  def new(word) do
+    %Hangman.Game{
       letters:
         word
         |> String.upcase()
         |> String.codepoints()
     }
+  end
 
-  def new_game(), do: new_game(Dictionary.random_word())
+  def new() do
+    new(Dictionary.random_word())
+  end
 
   @spec guess_letter(t(), String.t()) :: t()
   def guess_letter(game, letter) do
-    case game.game_state do
+    case game.state do
       n when n not in [:win, :lose] ->
         normalised_letter =
           letter
@@ -38,7 +40,7 @@ defmodule Hangman.Game do
         _guess_letter(
           game,
           normalised_letter,
-          Map.get(game.guesses, normalised_letter)
+          MapSet.member?(game.guesses, normalised_letter)
         )
 
       _ ->
@@ -46,19 +48,23 @@ defmodule Hangman.Game do
     end
   end
 
+  def continue_guessing(game), do: Map.put(game, :state, :guessing)
+
+  def is_over(game), do: game.state in [:win, :lose]
+
   def reveal_guessed(game),
     do:
       Enum.map(game.letters, fn letter ->
-        if Map.get(game.guesses, letter), do: letter, else: "_"
+        if MapSet.member?(game.guesses, letter), do: letter, else: "_"
       end)
 
   defp _guess_letter(game, _letter, _already_gessed = true),
-    do: Map.put(game, :game_state, :already_guessed)
+    do: game
 
   defp _guess_letter(game, letter, _already_gessed),
     do:
       process_guess(
-        Map.put(game, :guesses, Map.put(game.guesses, letter, true)),
+        Map.put(game, :guesses, MapSet.put(game.guesses, letter)),
         Enum.member?(game.letters, letter)
       )
 
@@ -71,23 +77,23 @@ defmodule Hangman.Game do
 
   defp process_guess(game, _good_guess), do: process_maybe_lose(game, game.turns_left == 1)
 
-  defp process_maybe_lose(game, _lose = true), do: Map.put(game, :game_state, :lose)
+  defp process_maybe_lose(game, _lose = true), do: Map.put(game, :state, :lose)
 
   defp process_maybe_lose(game, _lost),
     do:
       Map.merge(game, %{
-        :game_state => :bag_guess,
+        :state => :bad_guess,
         :turns_left => game.turns_left - 1
       })
 
-  defp process_maybe_win(game, _win = true), do: Map.put(game, :game_state, :win)
+  defp process_maybe_win(game, _win = true), do: Map.put(game, :state, :win)
 
-  defp process_maybe_win(game, _win), do: Map.put(game, :game_state, :good_guess)
+  defp process_maybe_win(game, _win), do: Map.put(game, :state, :good_guess)
 
   defp all_letters_guessed(letters, guesses),
     do:
       Enum.reduce(letters, true, fn letter, acc ->
-        if Map.get(guesses, letter),
+        if MapSet.member?(guesses, letter),
           do: acc,
           else: false
       end)

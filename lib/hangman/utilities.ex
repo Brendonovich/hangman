@@ -11,4 +11,10 @@ defmodule Hangman.Utilities do
     do:
       System.get_env(name) ||
         raise("environment variable #{name} is missing.")
+
+  def sort_guesses_map(map),
+    do:
+      map
+      |> Enum.map(fn v -> v end)
+      |> Enum.sort_by(fn {k, v} -> {-v, k} end)
 end

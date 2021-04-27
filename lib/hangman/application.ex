@@ -3,6 +3,8 @@ defmodule Hangman.Application do
   # for more information on OTP Applications
   @moduledoc false
 
+  alias Hangman.{GameSupervisor, ChatSupervisor}
+
   use Application
 
   def start(_type, _args) do
@@ -15,8 +17,10 @@ defmodule Hangman.Application do
       {Phoenix.PubSub, name: Hangman.PubSub},
       # Start the Endpoint (http/https)
       HangmanWeb.Endpoint,
-      {Registry, keys: :unique, name: Hangman.GameRegistry},
-      {DynamicSupervisor, strategy: :one_for_one, name: Hangman.GameSupervisor}
+      {Registry, keys: :unique, name: :game_server_registry},
+      {Registry, keys: :unique, name: :chat_server_registry},
+      GameSupervisor,
+      ChatSupervisor,
       # Start a worker by calling: Hangman.Worker.start_link(arg)
       # {Hangman.Worker, arg}
     ]

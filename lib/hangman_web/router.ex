@@ -28,10 +28,10 @@ defmodule HangmanWeb.Router do
     get "/redirect", OauthController, :redirect
   end
 
-  scope "/play", HangmanWeb do
+  scope "/", HangmanWeb do
     pipe_through [:browser, :authenticated]
 
-    live "/", PlayLive, :index
+    live "/play", PlayLive, :index
   end
 
   # Other scopes may use custom stacks.

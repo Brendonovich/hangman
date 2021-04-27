@@ -1,26 +1,65 @@
-<%= if @mounted do %>
+<div class="flex justify-center items-center flex-col w-screen h-screen">
   <h1 class="text-4xl mb-8 text-center">Hangman on Stream</h1>
-  <main class="px-8 py-6 bg-gray-800 rounded-xl flex flex-col justify-center items-center space-y-2 text-xl">
-    <%= case @game.game_state do %>
-      <%= n when n in [:win, :lose] -> %>
-        <p><%= Enum.join(@game.letters, "") %></p>
-        <p>You <%= if n == :win, do: "Win", else: "Lose" %>!</p>
-        <button phx-click="new_game" class="bg-gray-700 rounded-md py-1 px-2">Play Again</button>
+  <main class="px-8 py-6 w-full max-w-3xl bg-gray-800 rounded-xl flex flex-row space-x-4 text-2xl text-center">
+      <div style="flex: 2; height: 30rem" class="h-96 bg-gray-700 rounded-md flex flex-col justify-around space-y-2 py-4 px-6">
+        <p class="tracking-widest text-4xl <%= if !@game do "opacity-0" end %>"><%= if @game do Hangman.Game.reveal_guessed(@game) else "HANGMAN" end %></p>
+        <%= live_component(@socket, HangmanWeb.HangmanViewComponent, body_parts: if @game != nil and not Hangman.Game.is_over(@game) do 6 - @game.turns_left else 6 end) %>
+      </div>
+      <div style="flex: 2" class="p-2 w-80 flex flex-col items-stretch space-y-2">
+        <%= case @state do %>
+          <% :waiting -> %>
+            <%= f = form_for :game_setup, "#", phx_submit: :start_game, class: "grid grid-cols-3 gap-x-2 gap-y-4"%>
+              <%= submit "Start Game", class: "bg-gray-700 rounded-md py-1 px-2 col-span-full"%>
+            </form>
+          <% :playing -> %>
+              <div class="flex-1 flex flex-col items-stretch space-y-2">
+                <%= case @game.state do %>
+                  <%= n when n in [:win, :lose] -> %>
+                    <p><%= Enum.join(@game.letters, "") %></p>
+                    <p>You <%= if n == :win, do: "Win", else: "Lose" %>!</p>
+                    <button phx-click="start_game" class="bg-gray-700 rounded-md py-1 px-2">Play Again</button>
 
-      <% _ -> %>
-        <p class="tracking-widest text-4xl"><%=  Hangman.Game.reveal_guessed(@game) %></p>
-        <p class="text-2xl">Attempts left: <%= @game.turns_left %></p>
+                  <% :guessing -> %>
+                    <%= if @total_count != 0 do %>
+                      <button phx-click="submit_guess" class="bg-gray-700 rounded-md py-1 px-2">Submit Guess</button>
+                      <div class="flex flex-col items-strech space-y-2">
+                        <%= for {letter, count} <- Hangman.Utilities.sort_guesses_map(@guess_counts) do %>
+                          <div class="flex flex-row w-full items-center">
+                            <span class="mr-4 w-4"><%= letter %></span>
+                            <div class="bg-gray-500 transition-transform duration-300 ease-out flex-1 h-6"
+                               style="transform: translateX(-<%= (100 - 100 * count / @total_count) / 2 %>%) scaleX(<%= count / @total_count %>)"></div>
+                            <span class="ml-4"><%= Float.round(100 * count / @total_count, 1) %>%</span>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% else %>
+                      <p>No guesses submitted...</p>
+                    <% end %>
 
-        <p class="max-w-md text-center">
-          Go to
-          <u><a class="text-blue-300"
-             target="_blank"
-             rel="noreferrer noopener"
-             href="https://twitch.tv/<%= @twitch_username %>">
-            https://twitch.tv/<%= @twitch_username %>
-          <a></u>
-          to guess the word!
-        </p>
-    <% end %>
+                  <% :good_guess -> %>
+                    <button phx-click="next_round" class="bg-gray-700 rounded-md py-1 px-2">Next Round</button>
+                    <span>Good Guess!</span>
+                    <div class="flex flex-row w-full">
+                      <span class="mr-2 w-4"><%= @guess_counts |> Hangman.Utilities.sort_guesses_map |> List.first() |> elem(0) %></span>
+                      <span class="ml-2"><%= Float.round(100 * (@guess_counts |> Hangman.Utilities.sort_guesses_map |> List.first() |> elem(1)) / @total_count, 1) %>%</span>
+                    </div>
+                  <% :bad_guess -> %>
+                    <button phx-click="next_round" class="bg-gray-700 rounded-md py-1 px-2">Next Round</button>
+                    <span>Nope, Try Again</span>
+                <% end %>
+              </div>
+
+              <%= if !Hangman.Game.is_over(@game) and MapSet.size(@game.guesses) > 0 do %>
+                <%# <div class="flex flex-col text-center"> %>
+                  <span class="font-semibold">Previously Guessed</span>
+                  <span class="w-full flex-wrap space-x-1">
+                    <%= for letter <- @game.guesses do%>
+                      <span><%= letter %></span>
+                    <% end %>
+                  </span>
+                <%# </div> %>
+              <% end %>
+        <% end %>
+      </div>
   </main>
-<% end %>
+</div>

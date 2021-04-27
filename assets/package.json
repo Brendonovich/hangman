@@ -14,6 +14,7 @@
     "phoenix_live_view": "file:../deps/phoenix_live_view",
     "postcss-import": "^13.0.0",
     "tailwindcss": "^2.1.2",
+    "tailwindcss-phx-live": "^0.1.1",
     "topbar": "^0.1.4"
   },
   "devDependencies": {
@@ -26,6 +27,7 @@
     "mini-css-extract-plugin": "^0.9.0",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "postcss": "^8.2.12",
+    "postcss-cli": "^8.3.1",
     "postcss-loader": "4.2",
     "terser-webpack-plugin": "^2.3.2",
     "webpack": "^4.41.5",
