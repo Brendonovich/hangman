@@ -29,7 +29,7 @@ defmodule Hangman.Game do
   @spec guess_letter(t(), String.t()) :: t()
   def guess_letter(game, letter) do
     case game.game_state do
-      n when n in [:win, :lose] ->
+      n when n not in [:win, :lose] ->
         normalised_letter =
           letter
           |> String.first()
