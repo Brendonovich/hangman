@@ -16,8 +16,6 @@ import Hangman.Utilities
 #   url: database_url,
 #   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-
-
 config :hangman, HangmanWeb.Endpoint,
   http: [
     port: String.to_integer(System.get_env("PORT") || "4000"),
@@ -28,6 +26,7 @@ config :hangman, HangmanWeb.Endpoint,
 config :hangman,
   twitch_client_id: get_system_env("TWITCH_CLIENT_ID"),
   twitch_client_secret: get_system_env("TWITCH_CLIENT_SECRET"),
-  twitch_redirect_uri: get_system_env("TWITCH_REDIRECT_URI")
+  twitch_redirect_uri: get_system_env("TWITCH_REDIRECT_URI"),
+  secret_key_base: get_system_env("SECRET_KEY_BASE")
 
 config :hangman, HangmanWeb.Endpoint, server: true
