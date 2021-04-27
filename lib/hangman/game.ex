@@ -12,16 +12,18 @@ defmodule Hangman.Game do
   def new_game(), do: new_game(Dictionary.random_word())
 
   def guess_letter(game, letter) do
-    capital_letter =
-      letter
-      |> String.first()
-      |> String.capitalize()
+    if(!(game.game_state in [:win, :lose])) do
+      capital_letter =
+        letter
+        |> String.first()
+        |> String.capitalize()
 
-    _guess_letter(
-      game,
-      capital_letter,
-      Map.get(game.guesses, capital_letter)
-    )
+      _guess_letter(
+        game,
+        capital_letter,
+        Map.get(game.guesses, capital_letter)
+      )
+    end
   end
 
   def reveal_guessed(game),
@@ -33,14 +35,12 @@ defmodule Hangman.Game do
   defp _guess_letter(game, _letter, _already_gessed = true),
     do: Map.put(game, :game_state, :already_guessed)
 
-  defp _guess_letter(game, letter, _already_gessed) do
-    if(!(game.game_state in [:win, :lose])) do
+  defp _guess_letter(game, letter, _already_gessed),
+    do:
       process_guess(
         Map.put(game, :guesses, Map.put(game.guesses, letter, true)),
         Enum.member?(game.letters, letter)
       )
-    end
-  end
 
   defp process_guess(game, _good_guess = true),
     do:
