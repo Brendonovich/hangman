@@ -1,11 +1,11 @@
 <div class="flex justify-center items-center flex-col w-screen h-screen">
   <h1 class="text-4xl mb-8 text-center">Hangman on Stream</h1>
   <main class="px-8 py-6 w-full max-w-3xl bg-gray-800 rounded-xl flex flex-row space-x-4 text-2xl text-center">
-      <div style="flex: 2; height: 30rem" class="h-96 bg-gray-700 rounded-md flex flex-col justify-around space-y-2 py-4 px-6">
+      <div style="height: 30rem" class="flex-1 h-96 bg-gray-700 rounded-md flex flex-col justify-around space-y-2 py-4 px-6">
         <p class="tracking-widest text-4xl <%= if !@game do "opacity-0" end %>"><%= if @game do Hangman.Game.reveal_guessed(@game) else "HANGMAN" end %></p>
         <%= live_component(@socket, HangmanWeb.HangmanViewComponent, body_parts: if @game != nil and not Hangman.Game.is_over(@game) do 6 - @game.turns_left else 6 end) %>
       </div>
-      <div style="flex: 2" class="p-2 w-80 flex flex-col items-stretch space-y-2">
+      <div class="flex-1 p-2 w-80 flex flex-col items-stretch space-y-2">
         <%= case @state do %>
           <% :waiting -> %>
             <%= f = form_for :game_setup, "#", phx_submit: :start_game, class: "grid grid-cols-3 gap-x-2 gap-y-4"%>
