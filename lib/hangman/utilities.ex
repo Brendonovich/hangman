@@ -1,5 +1,5 @@
 defmodule Hangman.Utilities do
-  def get_env(name), do: Application.fetch_env!(:hangman, name)
+  def get_env(name), do: Application.get_env(:hangman, name)
 
   def decode_body(response),
     do:

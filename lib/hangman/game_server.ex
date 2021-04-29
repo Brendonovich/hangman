@@ -83,8 +83,7 @@ defmodule Hangman.GameServer do
         MapSet.member?(state.game.guesses, normalized_letter) ->
           state
 
-        #!MapSet.member?(state.chat_guesses, user)
-        true ->
+        !MapSet.member?(state.chat_guesses, user) ->
           %{
             state
             | chat_guesses: MapSet.put(state.chat_guesses, user),
