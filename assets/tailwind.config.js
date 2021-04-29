@@ -1,15 +1,12 @@
 const colors = require("tailwindcss/colors");
 
 module.exports = {
-  // purge: {
-  //   enabled: true,
-  //   content: [
-  //     "../lib/**/*.ex",
-  //     "../lib/**/*.leex",
-  //     "../lib/**/*.eex",
-  //     "./js/**/*.js",
-  //   ],
-  // },
+  purge: [
+    "../lib/**/*.ex",
+    "../lib/**/*.leex",
+    "../lib/**/*.eex",
+    "./js/**/*.js",
+  ],
   theme: {
     extend: {
       colors: {
@@ -21,5 +18,5 @@ module.exports = {
     },
   },
   variants: {},
-  plugins: [require("tailwindcss-phx-live")]
+  plugins: [require("tailwindcss-phx-live")],
 };
